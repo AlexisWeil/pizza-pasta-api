@@ -3,6 +3,8 @@ import { Categorie } from 'Categorie/models';
 import { Plat, PlatList } from 'Plat/models';
 import knex from 'global/knex';
 import * as _ from 'lodash';
+import { NotFound, Ok, useEndpoint } from 'global/api';
+import { Request } from 'express';
 
 const app = express();
 const port = 3000;
@@ -16,12 +18,12 @@ knex.raw('SELECT VERSION()')
     console.log('MySQL version : ', version[0][0]['VERSION()'])
   );
 
-app.get('/carte', (req, res) => {
+app.get('/carte', useEndpoint((req: Request) =>
   retrievePlatsWithCategories()
     .then(groupRowsByCategorie)
     .then(removeCategorieFromPlatLists)
-    .then((carte) => res.json(carte));
-});
+    .then(Ok)
+));
 
         const retrievePlatsWithCategories = () =>
           knex.select(
@@ -45,21 +47,14 @@ app.get('/carte', (req, res) => {
                   );
 
 
-
-app.get('/plat/:id', (req, res) => {
+app.get('/plat/:id', useEndpoint((req: Request) =>
   retrievePlatById(Number(req.params.id))
-    .then((plat: Plat | undefined) => {
-      if (!plat) {
-        res
-          .status(404)
-          .json({
-            error: 'Plat inconnu'
-          });
-      } else {
-        res.json(plat);
-      }
-    });
-});
+    .then((plat: Plat | undefined) =>
+      plat ?
+        Ok(plat) :
+        NotFound('Plat inconnu')
+    )
+));
 
         const retrievePlatById = (id: number): Promise<Plat | undefined> =>
           knex.select(
@@ -73,10 +68,10 @@ app.get('/plat/:id', (req, res) => {
             .first();
 
 
-app.get('/categories', (req, res) => {
+app.get('/categories', useEndpoint((req) =>
   listCategories()
-    .then((categories) => res.json(categories));
-});
+    .then(Ok)
+));
 
         const listCategories = (): Promise<Array<Categorie>> =>
           knex.select()
