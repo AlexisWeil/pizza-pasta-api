@@ -20,6 +20,18 @@ export const Plat = (
   ingredients
 });
 
+export const PlatInsert = (
+  categorieId: number,
+  nom: string,
+  prix: number,
+  ingredients: string
+) => ({
+  categorie_fk: categorieId,
+  nom,
+  prix,
+  ingredients
+});
+
 export interface PlatList {
   id: number,
   nom: string,
