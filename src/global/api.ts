@@ -1,31 +1,61 @@
 import { Request, Response } from 'express';
 
-interface Result {
-  status: number,
-  body?: object
+interface ResultBody {
+  success: boolean,
+  data?: object,
+  errors?: Array<Exception>
 }
 
-export const Ok = (body?: object): Result => ({
-  status: 200,
-  body
+interface Exception {
+  key: string,
+  message: string
+}
+
+export const Exception = (key: string, message: string): Exception => ({
+  key,
+  message
 });
 
-export const BadRequest = (body?: object): Result => ({
+export interface Result {
+  status: number,
+  body: ResultBody
+}
+
+export const Ok = (data?: object): Result => ({
   status: 200,
-  body
+  body: {
+    success: true,
+    data
+  }
+});
+
+export const BadRequest = (errors?: Array<Exception>): Result => ({
+  status: 200,
+  body: {
+    success: false,
+    errors
+  }
 });
 
 export const Unauthorized = (): Result => ({
   status: 401,
   body: {
-    error: 'You are no allowed to access this resource'
+    success: false,
+    errors: [{
+      key: 'Authentication',
+      message: 'You are no allowed to access this resource'
+    }]
   }
 });
 
 export const NotFound = (message?: string): Result => ({
   status: 404,
   body: {
-    error: message || 'Unknown resource'
+    success: false,
+    errors: [{
+      key: 'NotFound',
+      message: message || 'Unknown resource'
+    }]
   }
 });
 
