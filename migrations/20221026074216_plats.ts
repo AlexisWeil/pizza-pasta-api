@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { PlatInsert } from '../src/Plat/models';
+import { PlatInsert } from '../src/Plats/models';
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('plats', (table) => {

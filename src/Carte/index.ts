@@ -1,6 +1,6 @@
 import { Carte } from 'Carte/models';
-import { Categorie } from 'Categorie/models';
-import { Plat, PlatList, platToPlatList } from 'Plat/models';
+import { Categorie } from 'Categories/models';
+import { Plat, PlatList, platToPlatList } from 'Plats/models';
 
 
 export const buildCarte = (

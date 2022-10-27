@@ -29,7 +29,7 @@ export const NotFound = (message?: string): Result => ({
   }
 });
 
-type Endpoint = (req: Request) => Promise<Result>;
+export type Endpoint = (req: Request) => Promise<Result>;
 
 export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response) => {
   endpoint(req)

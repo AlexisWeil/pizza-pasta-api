@@ -50,3 +50,17 @@ export const PlatList = (
 
 export const platToPlatList = (plat: Plat): PlatList =>
   PlatList(plat.id, plat.nom, plat.prix);
+
+export type PlatListWithCategorie = PlatList & { categorie: string };
+
+export const PlatListWithCategorie = (
+  id: number,
+  categorie: string,
+  nom: string,
+  prix: number
+): PlatListWithCategorie => ({
+  id,
+  categorie,
+  nom,
+  prix
+});
