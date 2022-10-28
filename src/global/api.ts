@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import * as jwt from 'jsonwebtoken';
+import { UserInfo } from 'Authentification/models';
 
 interface ResultBody {
   success: boolean,
@@ -59,7 +61,8 @@ export const NotFound = (message?: string): Result => ({
   }
 });
 
-export type Endpoint = (req: Request) => Promise<Result>;
+
+export type Endpoint = (req: Request, userInfo?: UserInfo) => Promise<Result>;
 
 export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response) => {
   endpoint(req)
@@ -82,4 +85,19 @@ export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response)
         ]
       });
     });
+};
+
+export const secure = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+  const token = req.header('X-Auth-Token');
+
+  if (!token)
+    return Promise.resolve(Unauthorized());
+
+  try {
+    const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
+
+    return endpoint(req, data as UserInfo);
+  } catch (e: any) {
+    return Promise.resolve(Unauthorized());
+  }
 };
