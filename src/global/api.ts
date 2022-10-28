@@ -68,5 +68,18 @@ export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response)
 
       if (result.body)
         res.json(result.body);
+    })
+    .catch((e) => {
+      res.status(400);
+
+      res.json({
+        success: false,
+        errors: [
+          Exception(
+            e.key || e.name,
+            e.message
+          )
+        ]
+      });
     });
 };

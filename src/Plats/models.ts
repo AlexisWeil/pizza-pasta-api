@@ -32,6 +32,14 @@ export const PlatInsert = (
   ingredients
 });
 
+export const platToInsert = (plat: Plat) =>
+  PlatInsert(
+    plat.categorieId,
+    plat.nom,
+    plat.prix,
+    plat.ingredients
+  );
+
 export interface PlatList {
   id: number,
   nom: string,
