@@ -8,9 +8,9 @@ const platsRoutes = (app: Express) => {
 
   app.post('/plat', useEndpoint(secure(addPlatAPI(platsService))));
 
-  app.put('/plat/:id', useEndpoint(updatePlatAPI(platsService)));
+  app.put('/plat/:id', useEndpoint(secure(updatePlatAPI(platsService))));
 
-  app.delete('/plat/:id', useEndpoint(deletePlatAPI(platsService)));
+  app.delete('/plat/:id', useEndpoint(secure(deletePlatAPI(platsService))));
 };
 
 export default platsRoutes;

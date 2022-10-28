@@ -1,6 +1,11 @@
 
-
 export interface UserInfo {
   id: number,
-  username: string
+  nom: string
+}
+
+export interface User {
+  id: number,
+  nom: string,
+  motDePasse: string
 }
