@@ -2,16 +2,19 @@ import { Plat } from 'Plats/models';
 import knex from 'global/knex';
 import { getCommande } from 'Commande/models';
 
-export type RetrieveCommandeById = (id: number) => Promise<getCommande | undefined>;
 
-const retrieveCommandeById: RetrieveCommandeById = (id: number) =>{
- return knex.select(
+export type RetrieveCommandeById = (commandeId: number) => Promise<getCommande | undefined>;
+
+const retrieveCommandeById: RetrieveCommandeById = (commandeId: number) =>
+
+  knex.select(
     knex.ref('id'),
     knex.ref('id_table'),
     knex.ref('Plats'),
-    knex.ref('statut'),
+    knex.ref('prete'),
   )
-    .where({ 'id': id })
+    .from<getCommande>('commande')
+    .where( {id: commandeId} )
     .first();
- }
+ 
 export default retrieveCommandeById;

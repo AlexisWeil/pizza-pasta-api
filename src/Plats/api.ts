@@ -9,6 +9,7 @@ import knex from 'knex';
 import QueryBuilder = knex.QueryBuilder;
 
 export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req: Request) => {
+  
   const id = Number(req.params.id);
 
   if (isNaN(id))

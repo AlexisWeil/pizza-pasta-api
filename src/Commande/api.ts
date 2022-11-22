@@ -2,11 +2,14 @@ import { BadRequest, Endpoint, Exception, NotFound, Ok } from 'global/api';
 import { Request } from 'express';
 import { Commande } from 'Commande/models';
 import platsService, { PlatsService } from 'Plats/platsService';
-import { OK, z } from 'zod';
+import { number, OK, z } from 'zod';
 import { validate } from 'global/validations';
 import { Categorie } from 'Categories/models';
 import knex from 'knex';
 import commandeService, { CommandeService } from './commandeService';
+import { getCommandeWithPlatList } from './models';
+import { Plat } from 'Plats/models';
+
 
 
 
@@ -20,11 +23,38 @@ export const addCommandeAPI = (commandeService: CommandeService): Endpoint => (r
 }
 
 
-export const getCommandeAPI = (): Endpoint => (req: Request) => {
-  const id = Number(req.params.id)
-  return commandeService.retriveCommandeById(id).then(Ok);
+export const getCommandeAPI = (commandeService: CommandeService): Endpoint => (req: Request) => {
+  const id = Number(req.params.id);
+  if(isNaN(id)){
+    return Promise.resolve(BadRequest([Exception('id', 'ID is not a number')]));
+  }
+
+  return Promise.resolve(commandeService.getCommandeById(id).then((commande) => {
+    if(commande?.Plats){
+      const idPlats = formatStringToArray(commande.Plats)
+
+      return platsService.getPlatsByIds(idPlats).then((listPlat: Array<Plat>) => 
+       Promise.resolve(getCommandeWithPlatList(commande.id, commande.id_table,listPlat,commande.prete))
+      )
+    }
+  }).then(Ok))
+  //
 
 } 
+
+  const formatStringToArray = (str: String): Array<number> => {
+
+    let ids: Array<number> = [];
+    for(let i = 0; i < str.length -1 ; i++){
+      if(parseInt(str[i]))
+        ids.push(Number(str[i]))
+    }
+    return ids;
+  }
+
+
+
+
 
 const PlatForm = z.object({
   nom: z.string().max(30, { message: 'Nom du plat trop long' }),

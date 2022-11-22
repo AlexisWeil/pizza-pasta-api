@@ -1,4 +1,4 @@
-import {PlatList} from "Plats/models";
+import {Plat} from "Plats/models";
 
 
 export interface Commande {
@@ -51,16 +51,19 @@ export const commandeToInsert = (commandeJson: CommandeJson) =>
   );
 
   export interface getCommande {
+    id: number,
     id_table: number,
     Plats: String,
     prete: boolean,
   }
 
   export const getCommande = (
+    id: number,
     id_table: number,
     Plats: String,
     prete: boolean,
   ): getCommande => ({
+    id,
     id_table,
     Plats,
     prete,
@@ -68,17 +71,20 @@ export const commandeToInsert = (commandeJson: CommandeJson) =>
   
 
   
-  export interface getCommandeWithPlatList {
+  export interface GetCommandeWithPlatList {
+    id: number,
     id_table: number,
-    Plats: PlatList,
+    Plats: Array<Plat> | undefined,
     prete: boolean,
   }
 
   export const getCommandeWithPlatList = (
+    id: number,
     id_table: number,
-    Plats: PlatList,
+    Plats: Array<Plat> | undefined,
     prete: boolean,
-  ): getCommandeWithPlatList => ({
+  ): GetCommandeWithPlatList => ({
+    id,
     id_table,
     Plats,
     prete,
