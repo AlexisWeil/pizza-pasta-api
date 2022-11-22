@@ -7,7 +7,8 @@ const retrieveUserByNom: RetrieveUserByNom = (nom: string) =>
   knex.select(
     knex.ref('id'),
     knex.ref('nom'),
-    knex.ref('mot_de_passe').as('motDePasse')
+    knex.ref('mot_de_passe').as('motDePasse'),
+    knex.ref('role')
   ).from<User>('users')
     .where({ nom: nom })
     .first();
