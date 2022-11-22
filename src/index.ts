@@ -9,9 +9,10 @@ import carteRoutes from 'Carte/routes';
 import platsRoutes from 'Plats/routes';
 import categoriesRoutes from 'Categories/routes';
 import authentificationRoutes from 'Authentification/routes';
+import commandeRoute from 'Commande/routes';
 
 const app = express();
-const port = 3000;
+const port = 3002;
 
 app.use(express.json());
 
@@ -23,6 +24,7 @@ carteRoutes(app);
 platsRoutes(app);
 categoriesRoutes(app);
 authentificationRoutes(app);
+commandeRoute(app);
 
 knex.raw('SELECT VERSION()')
   .then((version) =>

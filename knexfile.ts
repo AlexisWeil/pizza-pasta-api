@@ -5,7 +5,7 @@ import type { Knex } from "knex";
 const config: { [key: string]: Knex.Config } = {
   development: {
     client: "mysql",
-    connection: "mysql://user:password@localhost:3306/pizza-pasta"
+    connection: "mysql://etienneP:blue@127.0.0.1:3306/pizza-pasta"
   }
 };
 
