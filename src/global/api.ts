@@ -87,7 +87,7 @@ export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response)
     });
 };
 
-export const secureServers = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+export const securePublic = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
   const token = req.header('X-Auth-Token');
 
   if (!token)
@@ -95,9 +95,9 @@ export const secureServers = (endpoint: Endpoint): Endpoint => (req: Request): P
 
   try {
     const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
-    console.log("Secure Cuisine : ",data)
+    console.log("Secure Public : ",data)
     const dataJSON:any = JSON.stringify(data);
-    if(dataJSON.id_role === 1){
+    if(dataJSON.id_role === (1|2|3)){
       return Promise.resolve(Unauthorized());
     }else{
       return endpoint(req, data as UserInfo);
@@ -107,7 +107,7 @@ export const secureServers = (endpoint: Endpoint): Endpoint => (req: Request): P
   }
 };
 
-export const secureCuisine = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+export const securePrivate = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
   const token = req.header('X-Auth-Token');
 
   if (!token)
@@ -115,29 +115,29 @@ export const secureCuisine = (endpoint: Endpoint): Endpoint => (req: Request): P
 
   try {
     const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
-    console.log("Secure Server : ",data)
+    console.log("Secure Private : ",data)
+    const dataJSON:any = JSON.stringify(data);
+    if(dataJSON.id_role === (2 | 3)){
+      return Promise.resolve(Unauthorized());
+    }else{
+      return endpoint(req, data as UserInfo);
+    }
+  } catch (e: any) {
+    return Promise.resolve(Unauthorized());
+  }
+};
+
+export const secureAdmin = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+  const token = req.header('X-Auth-Token');
+
+  if (!token)
+    return Promise.resolve(Unauthorized());
+
+  try {
+    const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
+    console.log("Secure Admin :", data)
     const dataJSON:any = JSON.stringify(data);
     if(dataJSON.id_role === 2){
-      return Promise.resolve(Unauthorized());
-    }else{
-      return endpoint(req, data as UserInfo);
-    }
-  } catch (e: any) {
-    return Promise.resolve(Unauthorized());
-  }
-};
-
-export const secureTable = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
-  const token = req.header('X-Auth-Token');
-
-  if (!token)
-    return Promise.resolve(Unauthorized());
-
-  try {
-    const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
-    console.log("Secure table :", data)
-    const dataJSON:any = JSON.stringify(data);
-    if(dataJSON.id_role === 3){
       return Promise.resolve(Unauthorized());
     }else{
       return endpoint(req, data as UserInfo);

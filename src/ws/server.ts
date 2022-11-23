@@ -24,16 +24,19 @@ server.on('upgrade', (req, socket, head) => {
   
   
   wss.on('connection', (socket, req) => {
-  
-    socket.on('message', (nom) => {
 
-        const token = req.headers["x-auth-token"];
-        console.log('token : ', token)
-       //const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
+    const token = req.headers["x-auth-token"];
+    const Jtoken = JSON.parse(JSON.stringify(token))
+    const data:any = jwt.verify(Jtoken, process.env['JWT_SECRET'] || 'secret');
+    console.log('token : ', data)
+
+    socket.on('message', (message) => {
+
+
 //parse / stringify
-        socket.send('Welcome : '+ nom);
+        socket.send('peroquet : '+ message);
     });
-    socket.send('Welcome !');
+    socket.send('Bonjour cher ' + data.nom);
   })
   
 }

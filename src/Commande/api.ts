@@ -8,9 +8,8 @@ import commandeService, { CommandeService } from './commandeService';
 
 export const updateStatutAPI = (commandeService: CommandeService): Endpoint => (req: Request) => {
   const id:number = Number(req.params.id); 
-  console.log(id)
   return commandeService.updateCommande(id).then((id:number) => {
-   return  Ok({message : 'La commande est prête a être servit.'})
+   return  Ok({message : 'La commande est prête a être servi :)'})
   });
 
 }
