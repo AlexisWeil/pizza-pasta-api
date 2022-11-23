@@ -1,4 +1,4 @@
-import {Plat} from "Plats/models";
+import { PlatService} from "Plats/models";
 
 
 
@@ -105,24 +105,25 @@ PlatsCommandeInsert(
   //----------------------------------------------------------
 
   
-  export interface GetCommandeWithPlatList {
-    id: number,
+  export interface GetCommandeWithPlatService {
+    id_commande: number,
     id_table: number,
-    Plats: Array<Plat> | undefined,
+    Plats: Array<PlatService> | undefined,
     prete: boolean,
   }
 
-  export const getCommandeWithPlatList = (
-    id: number,
+  export const getCommandeWithPlatService = (
+    id_commande: number,
     id_table: number,
-    Plats: Array<Plat> | undefined,
+    Plats: Array<PlatService> | undefined,
     prete: boolean,
-  ): GetCommandeWithPlatList => ({
-    id,
+  ): GetCommandeWithPlatService => ({
+    id_commande,
     id_table,
     Plats,
     prete,
   });
+
 
 
   //----------------------------------------------------------

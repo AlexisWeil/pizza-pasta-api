@@ -1,6 +1,6 @@
-import { Plat } from 'Plats/models';
+import { Plat, PlatService } from 'Plats/models';
 import knex from 'global/knex';
-import { getCommande } from 'Commande/models';
+import { GetCommandeWithPlatService, getCommandeWithPlatService } from 'Commande/models';
 
 
 export type RetrieveCommandeById = (commandeId: number) => Promise<any>;
@@ -9,44 +9,29 @@ const retrieveCommandeById: RetrieveCommandeById = (commandeId: number) =>{
 
 
   {console.log(commandeId)
-    return knex.raw(`SELECT commande.id, commande.id_table, commande.prete
-            FROM commande 
-               ;`)
+    return knex.raw(`SELECT commande.id, commande.id_table, commande.prete, 
+                            commande_plats.id_plats, commande_plats.id_commande,
+                            plats.nom, plats.prix, plats.ingredients
+                      FROM commande
+                        JOIN commande_plats 
+                          ON commande.id=commande_plats.id_commande
+                          JOIN plats
+                            ON plats.id = commande_plats.id_plats
+                              AND commande.id= ${commandeId}
+                  
+    ;`).then((res) => {
+      console.log(res[0])
+      const ArrayPlatService:Array<PlatService> = res[0].map((row:any) => {
+        return PlatService(row.nom, row.prix, row.ingredients)
+      })
+      const row = res[0][0]
+      console.log(row)
+      return getCommandeWithPlatService(row.id_commande, row.id_table, ArrayPlatService, row.prete)
+    })  
   }
 }
-// where commande.id= ${commandeId} 
+
 
 
  
 export default retrieveCommandeById;
-
-  // knex.select(
-  //   knex.ref('id'),
-  //   knex.ref('id_table'),
-  //   knex.ref('prete'),
-  //   knex.ref('id_plats')
-  // )
-  //   .from('commande')
-  //   .join('commande_plats', {'commande_plats.id' : 'commande.id'})
-  //   .where( {'commande.id': commandeId} )
-  //   .first()
-  //   .then((res) => {
-  //     console.log(res.id_plats)
-  //   });
-
-    // knex.table('commande_plats')
-    // .pluck('id_plats')
-    // .innerJoin('commande', {'commande_plats.id' : 'commande.id'})
-    // .where( {'commande.id': commandeId} )
-    // .then((res) => {
-    //   console.log(res.id_plats)
-    // });
-
-    // knex.raw(`SELECT commande.id, commande.id_table, commande.prete, 
-    //           commande_plats.id_plats, commande_plats.id_commande
-    //  FROM commande 
-    //  JOINT commande_plats ON commande_plats.id_commande=commande.id 
-    //  AND commande.id= ${commandeId} ;`)
-    //  .then((res) => {
-    //   console.log(res)
-    //  })

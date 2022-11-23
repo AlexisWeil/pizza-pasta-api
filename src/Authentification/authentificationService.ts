@@ -19,13 +19,13 @@ export class AuthentificationService {
         this.insertUser({
           ...user,
           motDePasse: mdp,
-          role: user.role
+          id_role: user.id_role
         })
       ).then((id) =>
         ({
           id,
           nom: user.nom,
-          role: user.role
+          id_role: user.id_role
         })
       );
 
@@ -39,7 +39,7 @@ export class AuthentificationService {
         return bcrypt.compare(motDePasse, user.motDePasse)
           .then((mdpValid) => {
             if (mdpValid)
-              return ({ id: user.id, nom: user.nom, role: user.role});
+              return ({ id: user.id, nom: user.nom, id_role: user.id_role});
             else
               throw Exception('motDePasse', 'Mot de passe incorrect');
           });

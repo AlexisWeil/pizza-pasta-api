@@ -7,7 +7,7 @@ import * as jwt from 'jsonwebtoken';
 const UserForm = z.object({
   nom: z.string(),
   motDePasse: z.string(),
-  role: z.number(),
+  id_role: z.number(),
 });
 
 type UserForm = z.infer<typeof UserForm>;

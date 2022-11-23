@@ -24,8 +24,8 @@ export const addCommandeAPI = (commandeService: CommandeService): Endpoint => (r
 }
 
 export const getCommandeAPI = (commandeService: CommandeService): Endpoint => (req: Request) => {
-
-  return commandeService.getCommandeById(req.body.id)
+  const id = Number(req.params.id)
+  return commandeService.getCommandeById(id).then(Ok)
 }
 
 // export const getCommandeAPI = (commandeService: CommandeService): Endpoint => (req: Request) => {

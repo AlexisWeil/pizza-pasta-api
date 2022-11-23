@@ -33,9 +33,7 @@ export class CommandeService {
   }
 
   getCommandeById = (id: number) : Promise<any> => {
-  
     return this.retrieveCommandeById(id)
-
   }
 
   addCommande = (commande: Commande) : Promise<Object> => {

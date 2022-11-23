@@ -87,7 +87,7 @@ export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response)
     });
 };
 
-export const secure = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+export const secureServers = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
   const token = req.header('X-Auth-Token');
 
   if (!token)
@@ -95,8 +95,54 @@ export const secure = (endpoint: Endpoint): Endpoint => (req: Request): Promise<
 
   try {
     const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
+    console.log("Secure Cuisine : ",data)
+    const dataJSON:any = JSON.stringify(data);
+    if(dataJSON.id_role === 1){
+      return Promise.resolve(Unauthorized());
+    }else{
+      return endpoint(req, data as UserInfo);
+    }
+  } catch (e: any) {
+    return Promise.resolve(Unauthorized());
+  }
+};
 
-    return endpoint(req, data as UserInfo);
+export const secureCuisine = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+  const token = req.header('X-Auth-Token');
+
+  if (!token)
+    return Promise.resolve(Unauthorized());
+
+  try {
+    const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
+    console.log("Secure Server : ",data)
+    const dataJSON:any = JSON.stringify(data);
+    if(dataJSON.id_role === 2){
+      return Promise.resolve(Unauthorized());
+    }else{
+      return endpoint(req, data as UserInfo);
+    }
+  } catch (e: any) {
+    return Promise.resolve(Unauthorized());
+  }
+};
+
+export const secureTable = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+  const token = req.header('X-Auth-Token');
+
+  if (!token)
+    return Promise.resolve(Unauthorized());
+
+  try {
+    const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
+    console.log("Secure table :", data)
+    const dataJSON:any = JSON.stringify(data);
+    if(dataJSON.id_role === 3){
+      return Promise.resolve(Unauthorized());
+    }else{
+      return endpoint(req, data as UserInfo);
+    }
+    
   } catch (e: any) {
     return Promise.resolve(Unauthorized());
   }

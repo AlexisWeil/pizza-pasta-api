@@ -10,7 +10,7 @@ import commandeRoute from 'Commande/routes';
 import { wsServer } from 'ws/server';
 
 const app = express();
-const port = 3002;
+const port = 3003;
 
 app.use(express.json());
 

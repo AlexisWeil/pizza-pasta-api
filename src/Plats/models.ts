@@ -56,6 +56,57 @@ export const PlatList = (
   prix
 });
 
+
+  //----------------------------------------------------------
+  //
+  //          PLATS & COMMANDE - GET - 
+  //
+  //----------------------------------------------------------
+
+  export interface PlatService {
+    nom: string,
+    prix: number,
+    ingredients: string
+  }
+  
+  export const PlatService = (
+    nom: string,
+    prix: number,
+    ingredients: string
+  ): PlatService => ({
+    nom,
+    prix,
+    ingredients
+  });
+
+  export const platServiceToInsert = (platService: PlatService) =>
+  PlatServiceInsert(
+    platService.nom,
+    platService.prix,
+    platService.ingredients
+  );
+
+  export const PlatServiceInsert = (
+    nom: string,
+    prix: number,
+    ingredients: string
+  ) => ({
+    nom,
+    prix,
+    ingredients
+  });
+
+
+
+
+
+    //----------------------------------------------------------
+  //
+  //          ??
+  //
+  //----------------------------------------------------------
+
+
 export const platToPlatList = (plat: Plat): PlatList =>
   PlatList(plat.id, plat.nom, plat.prix);
 
