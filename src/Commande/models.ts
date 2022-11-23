@@ -1,6 +1,17 @@
 import {Plat} from "Plats/models";
 
 
+
+  //----------------------------------------------------------
+  //
+  //                    COMMANDE 
+  //
+  //----------------------------------------------------------
+
+  //----------------------------------------------------------
+  // ARRAY NUMBER TYPE 
+
+
 export interface Commande {
   id_table: number,
   Plats: Array<Number>,
@@ -17,58 +28,81 @@ export const Commande = (
   prete,
 });
 
-export interface CommandeJson {
+  //----------------------------------------------------------
+  // BDD FORMAT  
+
+
+export interface CommandeToBDD {
   id_table: number,
-  Plats: String,
   prete: boolean,
 }
 
-export const CommandeJson = (
+export const CommandeToBDD = (
   id_table: number,
-  Plats: String,
   prete: boolean,
-): CommandeJson => ({
+): CommandeToBDD => ({
   id_table,
-  Plats,
   prete,
 });
 
 export const CommandeInsert = (
   id_table: number,
-  Plats: String,
   prete: boolean,
 ) => ({
   id_table,
-  Plats,
   prete
 });
 
-export const commandeToInsert = (commandeJson: CommandeJson) =>
+
+
+export const commandeToInsert = (commandeToBDD: CommandeToBDD) =>
   CommandeInsert(
-    commandeJson.id_table,
-    commandeJson.Plats,
-    commandeJson.prete
+    commandeToBDD.id_table,
+    commandeToBDD.prete
   );
 
-  export interface getCommande {
-    id: number,
-    id_table: number,
-    Plats: String,
-    prete: boolean,
-  }
 
-  export const getCommande = (
-    id: number,
-    id_table: number,
-    Plats: String,
-    prete: boolean,
-  ): getCommande => ({
-    id,
-    id_table,
-    Plats,
-    prete,
-  });
-  
+  //----------------------------------------------------------
+  //
+  //          PLATS - COMMANDE - ASSO 
+  //
+  //----------------------------------------------------------
+
+export interface PlatsCommandeToBDD {
+  id_commande: number,
+  id_plats: Number,
+}
+
+export const PlatsCommandeToBDD = (
+  id_commande: number,
+  id_plats: Number,
+): PlatsCommandeToBDD => ({
+  id_commande,
+  id_plats,
+});
+
+
+export const PlatsCommandeInsert = (
+  id_commande: number,
+  id_plats: Number,
+) => ({
+  id_commande,
+  id_plats
+});
+
+
+export const PlatscommandeToInsert = (platsCommandeToBDD: PlatsCommandeToBDD) =>
+PlatsCommandeInsert(
+  platsCommandeToBDD.id_commande,
+  platsCommandeToBDD.id_plats
+  );
+
+
+  //----------------------------------------------------------
+  //
+  //          PLATS & COMMANDE - GET - 
+  //
+  //----------------------------------------------------------
 
   
   export interface GetCommandeWithPlatList {
@@ -89,4 +123,48 @@ export const commandeToInsert = (commandeJson: CommandeJson) =>
     Plats,
     prete,
   });
+
+
+  //----------------------------------------------------------
+  //
+  //          OLD 
+  //
+  //----------------------------------------------------------
+
+
+
+  export interface getCommande {
+    id: number,
+    id_table: number,
+    prete: boolean,
+  }
+
+  export const getCommande = (
+    id: number,
+    id_table: number,
+    prete: boolean,
+  ): getCommande => ({
+    id,
+    id_table,
+    prete,
+  });
+  
+
+
+// //depreciated 
+// export interface CommandeJson {
+//   id_table: number,
+//   Plats: String,
+//   prete: boolean,
+// }
+// //depreciated 
+// export const CommandeJson = (
+//   id_table: number,
+//   Plats: String,
+//   prete: boolean,
+// ): CommandeJson => ({
+//   id_table,
+//   Plats,
+//   prete,
+// });
 

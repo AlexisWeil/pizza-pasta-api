@@ -1,19 +1,40 @@
 import { Plat, platToInsert } from 'Plats/models';
 import knex from 'global/knex';
-import { CommandeJson, commandeToInsert } from 'Commande/models';
+import { CommandeToBDD, commandeToInsert, PlatsCommandeToBDD , PlatscommandeToInsert} from 'Commande/models';
+import { number } from 'zod';
+import { BadRequest } from 'global/api';
 
-export type InsertCommande = (commandeJson: CommandeJson) => Promise<Object>;
 
-const insterCommande: InsertCommande = (commandeJson: CommandeJson) =>
+export type InsertCommande = (commandeToBDD: CommandeToBDD, ids: Number[]) => Promise<Object>;
+
+const insterCommande: InsertCommande = (commandeToBDD: CommandeToBDD, ids: Number[]) =>
   
-  {console.log(commandeJson)
-    return knex.insert(commandeToInsert(commandeJson))
+  {
+    let idcmd:Number;
+    return knex.insert(commandeToInsert(commandeToBDD))
     .into('commande')
     .returning('id')
     .then((res) => {
-      return {Identifiant : res[0], 
-              Statut : false, 
-              message : "Votre commande est en préparation ! :)"}
-    })};
+        idcmd = res [0]
+        ids.forEach((id)=>{
+          knex.insert(PlatscommandeToInsert(PlatsCommandeToBDD(res[0], id)))
+          .into('commande_plats')
+          .returning('id')
+          .then((result) => {
+            if(result[0] != number){
+              return BadRequest
+            }
+
+          })
+        })
+    }).then(() => {
+  return {Identifiant : idcmd, 
+    Statut : false, 
+    message : "Votre commande est en préparation ! :)"}
+    })
+  
+  };
+
+
 
 export default insterCommande;

@@ -1,14 +1,12 @@
 import retrievePlatById, { RetrievePlatById } from 'Plats/daos/retrievePlatById';
 import { Plat } from 'Plats/models';
-import insertPlat, { InsertPlat } from 'Plats/daos/insertPlat';
-import retrieveCategorieById, { RetrieveCategorieById } from 'Categories/daos/retrieveCategorieById';
-import { Categorie } from 'Categories/models';
 import { Exception, Ok } from 'global/api';
-import updatePlat, { UpdatePlat } from 'Plats/daos/updatePlat';
-import deletePlat, { DeletePlat } from 'Plats/daos/deletePlat';
-import { Commande, CommandeJson, getCommande } from './models';
+import { Commande, PlatsCommandeToBDD, CommandeToBDD } from './models';
 import insterCommande, {InsertCommande} from './daos/insertCommande';
 import retrieveCommandeById, {RetrieveCommandeById} from './daos/retrieveCommandeById';
+import updateStatutCommande, {UpdateStatutCommande} from './daos/updateCommande';
+
+
 
 
 
@@ -17,18 +15,24 @@ export class CommandeService {
 
   private readonly insertCommande : InsertCommande;
   private readonly retrieveCommandeById: RetrieveCommandeById;
+  private readonly updateStatutCommande: UpdateStatutCommande;
+
 
   constructor(
     insertCommande : InsertCommande,
-    retrieveCommandeById : RetrieveCommandeById
+    retrieveCommandeById : RetrieveCommandeById,
+    updateStatutCommande: UpdateStatutCommande,
+
 
   ) {
 
     this.insertCommande = insertCommande;
     this.retrieveCommandeById = retrieveCommandeById;
+    this.updateStatutCommande = updateStatutCommande;
+
   }
 
-  getCommandeById = (id: number) : Promise<getCommande | undefined> => {
+  getCommandeById = (id: number) : Promise<any> => {
   
     return this.retrieveCommandeById(id)
 
@@ -36,17 +40,26 @@ export class CommandeService {
 
   addCommande = (commande: Commande) : Promise<Object> => {
 
-    const platString = JSON.stringify(commande.Plats)
-    const userCommandeJson = CommandeJson(commande.id_table, platString, commande.prete)
 
-     return this.insertCommande(userCommandeJson);
+    const userCommande = CommandeToBDD(commande.id_table, commande.prete)
+    //const userCommandeJson = CommandeJson(commande.id_table, platString, commande.prete)
+     
+     return this.insertCommande(userCommande, commande.Plats)
+  }
+
+  
+
+  updateCommande = (idCommande: number) => {
+    return this.updateStatutCommande(idCommande);
   }
 
 }
 const commandeService =
   new CommandeService(
     insterCommande,
-    retrieveCommandeById
+    retrieveCommandeById,
+    updateStatutCommande,
+
   );
 
 export default commandeService;

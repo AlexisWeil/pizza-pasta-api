@@ -28,18 +28,19 @@ export class PlatsService {
     this.deletePlat = deletePlat;
   }
 
+
+
   getPlatsByIds = (id : Array<number>): Promise<Array<Plat>> => {
     let ListPlat:Array<Plat> = [];
     id.forEach((idPlat) => {
        this.retrievePlatById(idPlat).then((plat) => {
         if(plat != undefined){
-          console.log(plat)
-          ListPlat.push(plat);
+           return ListPlat.push(plat);
         }
        });
     })
 
-    return Promise.resolve(ListPlat);
+    return Promise.all(ListPlat);
   }
 
   getPlatById = (id: number): Promise<Plat | undefined> =>
