@@ -45,7 +45,7 @@ export class CommandeService {
      return this.insertCommande(userCommande, commande.Plats)
   }
 
-  
+
 
   updateCommande = (idCommande: number) => {
     return this.updateStatutCommande(idCommande);

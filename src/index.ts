@@ -6,8 +6,9 @@ import platsRoutes from 'Plats/routes';
 import categoriesRoutes from 'Categories/routes';
 import authentificationRoutes from 'Authentification/routes';
 import commandeRoute from 'Commande/routes';
+import { wsServer } from 'webSocketServer/server';
 
-import { wsServer } from 'ws/server';
+
 
 const app = express();
 const port = 3003;
@@ -25,6 +26,7 @@ categoriesRoutes(app);
 authentificationRoutes(app);
 commandeRoute(app);
 wsServer(app, port);
+
 
 
 knex.raw('SELECT VERSION()')
