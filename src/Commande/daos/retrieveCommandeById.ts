@@ -8,7 +8,7 @@ export type RetrieveCommandeById = (commandeId: number) => Promise<any>;
 const retrieveCommandeById: RetrieveCommandeById = (commandeId: number) =>{
 
 
-  {console.log(commandeId)
+  {
     return knex.raw(`SELECT commande.id, commande.id_table, commande.prete, 
                             commande_plats.id_plats, commande_plats.id_commande,
                             plats.nom, plats.prix, plats.ingredients
@@ -20,12 +20,10 @@ const retrieveCommandeById: RetrieveCommandeById = (commandeId: number) =>{
                               AND commande.id= ${commandeId}
                   
     ;`).then((res) => {
-      console.log(res[0])
       const ArrayPlatService:Array<PlatService> = res[0].map((row:any) => {
         return PlatService(row.nom, row.prix, row.ingredients)
       })
       const row = res[0][0]
-      console.log(row)
       return getCommandeWithPlatService(row.id_commande, row.id_table, ArrayPlatService, row.prete)
     })  
   }

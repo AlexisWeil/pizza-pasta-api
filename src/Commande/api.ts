@@ -2,6 +2,9 @@ import { BadRequest, Endpoint, Exception, NotFound, Ok } from 'global/api';
 import { Request } from 'express';
 import { Commande } from 'Commande/models';
 import commandeService, { CommandeService } from './commandeService';
+import * as jwt from 'jsonwebtoken';
+import { CL } from 'webSocketServer/server';
+
 
 
 
@@ -16,9 +19,23 @@ export const updateStatutAPI = (commandeService: CommandeService): Endpoint => (
 
 export const addCommandeAPI = (commandeService: CommandeService): Endpoint => (req: Request) => {
   
+  const token = req.headers["x-auth-token"];
+  const Jtoken = JSON.parse(JSON.stringify(token))
+  const data:any = jwt.verify(Jtoken, process.env['JWT_SECRET'] || 'secret');
+  //const cuisineClient = clientService.getClientFromName(data.nom)
+  CL.sendMessage('une commane a été passé ! :)')
+  
+
   const userCommande: Commande = Commande(req.body.id_table,
                                           req.body.Plats, 
-                                          req.body.prete)       
+                                          req.body.prete)
+  
+  // cuisineClient[1].socket.on('commande', (commande:Commande) => {
+
+  //   cuisineClient[1].socket.send('peroquet : '+ commande);
+  // });
+
+
   return Promise.resolve(commandeService.addCommande(userCommande)).then(Ok);
 }
 
@@ -27,34 +44,6 @@ export const getCommandeAPI = (commandeService: CommandeService): Endpoint => (r
   return commandeService.getCommandeById(id).then(Ok)
 }
 
-// export const getCommandeAPI = (commandeService: CommandeService): Endpoint => (req: Request) => {
-//   const id = Number(req.params.id);
-//   if(isNaN(id)){
-//     return Promise.resolve(BadRequest([Exception('id', 'ID is not a number')]));
-//   }
-
-//   return Promise.resolve(commandeService.getCommandeById(id).then((commande) => {
-//     if(commande?.Plats){
-//       const idPlats = formatStringToArray(commande.Plats)
-//      //const idPlats = JSON.parse(commande.Plats)
-//       return platsService.getPlatsByIds(idPlats).then((listPlat: Array<Plat>) => 
-//        Promise.resolve(getCommandeWithPlatList(commande.id, commande.id_table,listPlat,commande.prete))
-//       )
-//     }
-//   }).then(Ok))
-//   //
-
-// } 
-
-  // const formatStringToArray = (str: String): Array<number> => {
-
-  //   let ids: Array<number> = [];
-  //   for(let i = 0; i < str.length -1 ; i++){
-  //     if(parseInt(str[i]))
-  //       ids.push(Number(str[i]))
-  //   }
-  //   return ids;
-  // }
 
 
 

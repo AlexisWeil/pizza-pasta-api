@@ -3,9 +3,12 @@ import {WebSocketServer} from 'ws';
 import * as express from 'express';
 import { Express, Request } from "express-serve-static-core";
 import * as jwt from "jsonwebtoken";
+import clientService from "./clientService";
+import { cuisineListener } from "./CuisineListener";
 
 
-export const wsServer = (app:Express, port:number ) => {
+export const CL = new cuisineListener()
+export const wsServer = (app:Express, port:number) => {
 
 
 const server = app.listen(port, () => {
@@ -28,15 +31,24 @@ server.on('upgrade', (req, socket, head) => {
     const token = req.headers["x-auth-token"];
     const Jtoken = JSON.parse(JSON.stringify(token))
     const data:any = jwt.verify(Jtoken, process.env['JWT_SECRET'] || 'secret');
-    console.log('token : ', data)
+    //console.log('token : ', data)
+    //console.log("Socket : ",socket)
+    //clientService.saveClient(data.nom, data.id_role, socket)
+    if(data.nom === 'Cuisine'){
+      CL.setSocket(socket)
+      CL.startListening
+    }
+    
+    
+    
 
-    socket.on('message', (message) => {
 
+    socket.on('message', (message:string) => {
 
-//parse / stringify
         socket.send('peroquet : '+ message);
     });
     socket.send('Bonjour cher ' + data.nom);
+
   })
   
 }
