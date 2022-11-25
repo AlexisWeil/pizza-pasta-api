@@ -73,6 +73,8 @@ export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response)
         res.json(result.body);
     })
     .catch((e) => {
+      console.log(e);
+
       res.status(400);
 
       res.json({

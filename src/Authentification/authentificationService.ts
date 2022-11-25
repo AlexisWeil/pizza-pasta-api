@@ -23,7 +23,10 @@ export class AuthentificationService {
       ).then((id) =>
         ({
           id,
-          nom: user.nom
+          nom: user.nom,
+          role: user.role,
+          serveurId: user.serveurId,
+          tablesIds: user.tablesIds
         })
       );
 
@@ -37,7 +40,13 @@ export class AuthentificationService {
         return bcrypt.compare(motDePasse, user.motDePasse)
           .then((mdpValid) => {
             if (mdpValid)
-              return ({ id: user.id, nom: user.nom});
+              return ({
+                id: user.id,
+                nom: user.nom,
+                role: user.role,
+                serveurId: user.serveurId,
+                tablesIds: user.tablesIds
+              });
             else
               throw Exception('motDePasse', 'Mot de passe incorrect');
           });

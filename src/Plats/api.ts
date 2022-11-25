@@ -1,12 +1,9 @@
 import { BadRequest, Endpoint, Exception, NotFound, Ok } from 'global/api';
 import { Request } from 'express';
 import { Plat } from 'Plats/models';
-import platsService, { PlatsService } from 'Plats/platsService';
+import { PlatsService } from 'Plats/platsService';
 import { z } from 'zod';
 import { validate } from 'global/validations';
-import { Categorie } from 'Categories/models';
-import knex from 'knex';
-import QueryBuilder = knex.QueryBuilder;
 
 export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req: Request) => {
   const id = Number(req.params.id);
@@ -33,7 +30,12 @@ type PlatForm = z.infer<typeof PlatForm>;
 
 export const addPlatAPI = (platsService: PlatsService): Endpoint => (req: Request) =>
   validate(PlatForm)(req.body)((plat: PlatForm) =>
-    platsService.createPlat({ ...plat, id: 0 })
+    platsService.createPlat({
+      ...plat,
+      id: 0,
+      categorieId: Number(plat.categorieId),
+      prix: Number(plat.prix)
+    })
       .then(Ok)
   );
 
@@ -50,7 +52,11 @@ export const updatePlatAPI = (platsService: PlatsService): Endpoint => (req: Req
   validate(UpdatePlatForm)
     ({ ...req.body, id: Number(req.params.id) })
     ((plat: UpdatePlatForm) =>
-      platsService.modifyPlat(plat)
+      platsService.modifyPlat({
+        ...plat,
+        categorieId: Number(plat.categorieId),
+        prix: Number(plat.prix)
+      })
         .then(Ok)
     );
 
