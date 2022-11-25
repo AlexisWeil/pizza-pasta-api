@@ -36,7 +36,12 @@ export const addPlatAPI = (platsService: PlatsService): Endpoint => (req: Reques
       categorieId: Number(plat.categorieId),
       prix: Number(plat.prix)
     })
-      .then(Ok)
+      .then((ePlat) =>
+        ePlat.cata(
+          (e) => BadRequest([e]),
+          Ok
+        )
+      )
   );
 
 const UpdatePlatForm =

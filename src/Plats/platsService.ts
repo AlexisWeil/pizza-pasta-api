@@ -6,6 +6,7 @@ import { Categorie } from 'Categories/models';
 import { Exception } from 'global/api';
 import updatePlat, { UpdatePlat } from 'Plats/daos/updatePlat';
 import deletePlat, { DeletePlat } from 'Plats/daos/deletePlat';
+import { Either, Left, Maybe, Right } from 'monet';
 
 export class PlatsService {
   private readonly retrievePlatById: RetrievePlatById;
@@ -31,25 +32,35 @@ export class PlatsService {
   getPlatById = (id: number): Promise<Plat | undefined> =>
     this.retrievePlatById(id);
 
-  createPlat = (plat: Plat): Promise<Plat> =>
+  createPlat = (plat: Plat): Promise<Either<Exception, Plat>> =>
     this.checkIfCategorieExists(plat)
-      .then(this.insertPlat)
+      .then(this.insertPlatIfAllowed)
       .then(this.addIdToPlat(plat));
 
-  private checkIfCategorieExists = (plat: Plat): Promise<Plat> =>
+  private checkIfCategorieExists = (plat: Plat): Promise<Either<Exception, Plat>> =>
     this.retrieveCategorieById(plat.categorieId)
-      .then((cat: Categorie | undefined) => {
-        if (!cat)
-          throw Exception('categorieId', 'Catégorie inconnue');
+      .then((eCat: Either<Exception, Maybe<Categorie>>) =>
+        eCat.flatMap((cat) =>
+          cat.cata(
+            () => Left(Exception('categorieId', 'Catégorie inconnue')),
+            () => Right(plat)
+          )
+        )
+      );
 
-        return plat;
-      });
+  private insertPlatIfAllowed = (ePlat: Either<Exception, Plat>): Promise<Either<Exception, number>> =>
+    ePlat.cata(
+      (e) => Promise.resolve(Left(e)),
+      (plat) => this.insertPlat(plat)
+    );
 
-  private addIdToPlat = (plat: Plat) => (id: number) =>
-    ({
-      ...plat,
-      id
-    });
+  private addIdToPlat = (plat: Plat) => (eId: Either<Exception, number>): Either<Exception, Plat> =>
+    eId.map((id) =>
+      ({
+        ...plat,
+        id
+      })
+    );
 
   modifyPlat = (plat: Plat): Promise<Plat> =>
     this.updatePlat(plat);

@@ -8,7 +8,7 @@ interface ResultBody {
   errors?: Array<Exception>
 }
 
-interface Exception {
+export interface Exception {
   key: string,
   message: string
 }
@@ -32,7 +32,7 @@ export const Ok = (data?: object): Result => ({
 });
 
 export const BadRequest = (errors?: Array<Exception>): Result => ({
-  status: 200,
+  status: 400,
   body: {
     success: false,
     errors
