@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AuthentificationService } from 'Authentification/authentificationService';
-import { Endpoint, Ok } from 'global/api';
+import { Endpoint, Exception, Ok } from 'global/api';
 import { validate } from 'global/validations';
 import * as jwt from 'jsonwebtoken';
 
@@ -31,10 +31,14 @@ export const loginAPI = (authentificationService: AuthentificationService): Endp
   validate(LoginForm)(req.body)((login: LoginForm) =>
     authentificationService.verificationConnexion(login.nom, login.motDePasse)
       .then((userInfo) => {
-        const token = jwt.sign(userInfo, process.env['JWT_SECRET'] || 'secret', { expiresIn: '30d' });
-
-        return Ok({
-          token
-        });
+        if (userInfo) {
+          const token = jwt.sign(userInfo, process.env['JWT_SECRET'] || 'secret', { expiresIn: '30d' });
+          return Ok({
+            token
+          })
+        }
+        else {
+          return Exception("User Info", "Pas d'utilisateurs");
+        }
       })
   );

@@ -1,7 +1,8 @@
 import { Plat } from 'Plats/models';
 import knex from 'global/knex';
+import { Maybe, None, Some } from 'monet';
 
-export type RetrievePlatById = (id: number) => Promise<Plat | undefined>;
+export type RetrievePlatById = (id: number) => Promise<Maybe<Plat>>;
 
 const retrievePlatById: RetrievePlatById = (id: number) =>
   knex.select(
@@ -12,6 +13,7 @@ const retrievePlatById: RetrievePlatById = (id: number) =>
     knex.ref('ingredients')
   ).from<Plat>('plats')
     .where({ 'id': id })
-    .first();
+    .first()
+    .then((plat:Plat | undefined) => plat? Some(plat) : None());
 
 export default retrievePlatById;

@@ -3,6 +3,7 @@ import retrieveUserByNom, { RetrieveUserByNom } from 'Authentification/daos/retr
 import { User, UserInfo } from 'Authentification/models';
 import { Exception } from 'global/api';
 import * as bcrypt from 'bcrypt';
+import { Either, Left, Maybe, None, Right, Some } from 'monet';
 
 export class AuthentificationService {
   private readonly insertUser: InsertUser;
@@ -31,27 +32,20 @@ export class AuthentificationService {
       );
 
 
-  verificationConnexion = (nom: string, motDePasse: string): Promise<UserInfo> =>
+  verificationConnexion = (nom: string, motDePasse: string): Promise<Maybe<UserInfo>> =>
     this.retrieveUserByNom(nom)
-      .then((user) => {
-        if (!user)
-          throw Exception('username', 'Utilisateur inconnu');
-
-        return bcrypt.compare(motDePasse, user.motDePasse)
-          .then((mdpValid) => {
-            if (mdpValid)
-              return ({
-                id: user.id,
-                nom: user.nom,
-                role: user.role,
-                serveurId: user.serveurId,
-                tablesIds: user.tablesIds
-              });
-            else
-              throw Exception('motDePasse', 'Mot de passe incorrect');
-          });
-      });
-}
+    .then((user) => 
+      user.cata(
+        () => None(),
+        (usr) => bcrypt.compare(motDePasse, usr.motDePasse)
+          .then((mdpValid) =>
+            mdpValid?
+              Some(UserInfo(usr.id, usr.nom, usr.role, usr.serveurId, usr.tablesIds))
+              :
+              None()
+          )
+      )
+    )
 
 const authentificationService = new AuthentificationService(insertUser, retrieveUserByNom);
 

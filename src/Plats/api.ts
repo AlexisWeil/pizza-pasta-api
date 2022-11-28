@@ -4,6 +4,7 @@ import { Plat } from 'Plats/models';
 import { PlatsService } from 'Plats/platsService';
 import { z } from 'zod';
 import { validate } from 'global/validations';
+import { Maybe, Some } from 'monet';
 
 export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req: Request) => {
   const id = Number(req.params.id);
@@ -12,9 +13,9 @@ export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req: Re
     return Promise.resolve(BadRequest([Exception('id', 'ID is not a number')]));
 
   return platsService.getPlatById(id)
-    .then((plat: Plat | undefined) =>
+    .then((plat: Maybe<Plat>) =>
       plat ?
-        Ok(plat) :
+        Ok(Some(plat)) :
         NotFound('Plat inconnu')
     );
 };

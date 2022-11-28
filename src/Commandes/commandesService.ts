@@ -6,6 +6,7 @@ import { Exception } from 'global/api';
 import retrieveCommandeById, { RetrieveCommandeById } from 'Commandes/daos/retrieveCommandeById';
 import updateCommandeStatut, { UpdateCommandeStatut } from 'Commandes/daos/updateCommandeStatut';
 import eventManager, { CommandePrete, NouvelleCommande } from 'Events';
+import { Maybe, None, Some } from 'monet';
 
 export class CommandesService {
   private readonly insertCommande: InsertCommande;
@@ -30,22 +31,23 @@ export class CommandesService {
       commande.plats.map((platId) =>
         this.retrievePlatById(platId)
       )
-    ).then((plats: Array<Plat | undefined>) => {
+    ).then((plats: Array<Maybe<Plat>>) => {
       const unknownPlats =
         commande.plats.filter((platId) =>
           plats.find((plat) =>
-            plat && plat.id === platId
-          ) === undefined
+            plat.cata(
+              () => false,
+              () => true
+            )
+          )
         );
 
       if (unknownPlats.length > 0)
         throw Exception('plats', 'Plats inconnus : ' + unknownPlats);
 
       return plats
-        .filter((p) => p !== undefined)
-        .map((plat: Plat | undefined) => plat as Plat);
     })
-      .then((plats: Array<Plat>) =>
+      .then((plats: Array<Maybe<Plat>>) =>
         this.insertCommande(commande)
           .then((id) => ({
             id,
@@ -65,7 +67,7 @@ export class CommandesService {
         return commande;
       });
 
-  getCommandeById = (commandeId: number): Promise<Commande | undefined> =>
+  getCommandeById = (commandeId: number): Promise<Maybe<Commande>> =>
     this.retrieveCommandeById(commandeId);
 
   modifyCommandeStatut = (commandeId: number, statut: boolean): Promise<void> =>
@@ -74,15 +76,16 @@ export class CommandesService {
         this.getCommandeById(commandeId)
       )
       .then((commande) => {
-        if (statut && commande) {
-          eventManager.broadcast<CommandePrete>({
-            key: 'COMMANDE_' + commande.tableId + '_PRETE',
-            data: {
-              commandeId,
-              tableId: commande.tableId
-            }
-          });
-        }
+        commande.cata(
+          () => None(),
+          (comm) => Some(eventManager.broadcast<CommandePrete>({
+                key: 'COMMANDE_' + comm.tableId + '_PRETE',
+                data: {
+                  commandeId,
+                  tableId: comm.tableId
+                }
+          }))
+        );
       });
 };
 

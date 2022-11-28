@@ -2,8 +2,8 @@ import k, { Knex } from 'knex';
 
 const initialisationKnex = () => {
   const knex = k({
-    client: 'mysql',
-    connection: 'mysql://user:password@localhost:3306/pizza-pasta'
+    client: 'mysql2',
+    connection: 'mysql2://root:root@localhost:8080/pizza-pasta'
   });
 
   knex.migrate.latest()

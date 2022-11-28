@@ -29,7 +29,7 @@ export class PlatsService {
     this.deletePlat = deletePlat;
   }
 
-  getPlatById = (id: number): Promise<Plat | undefined> =>
+  getPlatById = (id: number): Promise<Maybe<Plat>> =>
     this.retrievePlatById(id);
 
   createPlat = (plat: Plat): Promise<Either<Exception, Plat>> =>

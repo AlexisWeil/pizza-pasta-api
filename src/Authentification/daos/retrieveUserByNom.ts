@@ -1,7 +1,8 @@
 import { User } from 'Authentification/models';
 import knex from 'global/knex';
+import { Maybe, None, Some } from 'monet';
 
-export type RetrieveUserByNom = (nom: string) => Promise<User | undefined>;
+export type RetrieveUserByNom = (nom: string) => Promise<Maybe<User>>;
 
 const retrieveUserByNom: RetrieveUserByNom = (nom: string) =>
   knex.select(
@@ -16,18 +17,18 @@ const retrieveUserByNom: RetrieveUserByNom = (nom: string) =>
     .where({ 'U.nom': nom })
     .then((rows) => {
       if (rows.length <= 0)
-        return undefined;
+        return None();
 
       const u = rows[0];
 
-      return User(
+      return Some(User(
         u.id,
         u.nom,
         u.motDePasse,
         u.role,
         u.serveurId,
         rows.map((row) => row['tableId'])
-      );
+      ));
     });
 
 export default retrieveUserByNom;
