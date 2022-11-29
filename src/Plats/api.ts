@@ -5,7 +5,7 @@ import { PlatsService } from 'Plats/platsService';
 import { z } from 'zod';
 import { validate } from 'global/validations';
 
-export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req: Request) => {
+export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req) => {
   const id = Number(req.params.id);
 
   if (isNaN(id))
@@ -33,7 +33,7 @@ const PlatForm = z.object({
 
 type PlatForm = z.infer<typeof PlatForm>;
 
-export const addPlatAPI = (platsService: PlatsService): Endpoint => (req: Request) =>
+export const addPlatAPI = (platsService: PlatsService): Endpoint => (req) =>
   validate(PlatForm)(req.body)((plat: PlatForm) =>
     platsService.createPlat({
       ...plat,
@@ -58,7 +58,7 @@ const UpdatePlatForm =
 
 type UpdatePlatForm = z.infer<typeof UpdatePlatForm>;
 
-export const updatePlatAPI = (platsService: PlatsService): Endpoint => (req: Request) =>
+export const updatePlatAPI = (platsService: PlatsService): Endpoint => (req) =>
   validate(UpdatePlatForm)
     ({ ...req.body, id: Number(req.params.id) })
     ((plat: UpdatePlatForm) =>
@@ -70,7 +70,7 @@ export const updatePlatAPI = (platsService: PlatsService): Endpoint => (req: Req
         .then(Ok)
     );
 
-export const deletePlatAPI = (platsService: PlatsService): Endpoint => (req: Request) =>
+export const deletePlatAPI = (platsService: PlatsService): Endpoint => (req) =>
   validate(z.number())
     (Number(req.params.id))
     ((id: number) =>

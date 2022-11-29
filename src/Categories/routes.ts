@@ -6,11 +6,11 @@ import categoriesService from 'Categories/categoriesService';
 const categoriesRoutes = (app: Express) => {
   app.get('/categories', useEndpoint(listCategoriesAPI(categoriesService)));
 
-  app.post('/categorie', useEndpoint(secure(addCategorieAPI(categoriesService))));
+  app.post('/categorie', useEndpoint(addCategorieAPI(categoriesService)));
 
-  app.put('/categorie/:id', useEndpoint(secure(updateCategorieAPI(categoriesService))));
+  app.put('/categorie/:id', useEndpoint(updateCategorieAPI(categoriesService)));
 
-  app.delete('/categorie/:id', useEndpoint(secure(deleteCategorieAPI(categoriesService))));
+  app.delete('/categorie/:id', useEndpoint(deleteCategorieAPI(categoriesService)));
 };
 
 export default categoriesRoutes;

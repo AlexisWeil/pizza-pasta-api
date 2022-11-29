@@ -2,20 +2,34 @@ import insertUser, { InsertUser } from 'Authentification/daos/insertUser';
 import retrieveUserByNom, { RetrieveUserByNom } from 'Authentification/daos/retrieveUserByNom';
 import { User, UserInfo } from 'Authentification/models';
 import { Exception } from 'global/api';
-import * as bcrypt from 'bcrypt';
 import { Either, Left, Right } from 'monet';
+import * as realBcrypt from 'bcrypt';
+
+type BcryptProxy = {
+  compare: (data: string | Buffer, encrypted: string) => Promise<boolean>,
+  hash: (data: string | Buffer, saltOrRounds: string | number) => Promise<string>
+};
+
+const fakeBcrypt: BcryptProxy = {
+  compare: (data: string | Buffer, encrypted: string) =>
+    Promise.resolve(data === encrypted),
+  hash: (data: string | Buffer, saltOrRounds: string | number) =>
+    Promise.resolve('###')
+};
 
 export class AuthentificationService {
   private readonly insertUser: InsertUser;
   private readonly retrieveUserByNom: RetrieveUserByNom;
+  private readonly bcrypt: BcryptProxy;
 
-  constructor(insertUser: InsertUser, retrieveUserByNom: RetrieveUserByNom) {
+  constructor(insertUser: InsertUser, retrieveUserByNom: RetrieveUserByNom, bcrypt: BcryptProxy) {
     this.insertUser = insertUser;
     this.retrieveUserByNom = retrieveUserByNom;
+    this.bcrypt = bcrypt;
   }
 
   creerCompte = (user: User): Promise<UserInfo> =>
-    bcrypt.hash(user.motDePasse, 10)
+    this.bcrypt.hash(user.motDePasse, 10)
       .then((mdp) =>
         this.insertUser({
           ...user,
@@ -41,7 +55,7 @@ export class AuthentificationService {
             mUser.cata(
               () => Promise.resolve(Left(Exception('username', 'Utilisateur inconnu'))),
               (user) =>
-                bcrypt.compare(motDePasse, user.motDePasse)
+                this.bcrypt.compare(motDePasse, user.motDePasse)
                   .then((mdpValid) => {
                     if (mdpValid)
                       return Right<Exception, UserInfo>({
@@ -59,6 +73,6 @@ export class AuthentificationService {
       );
 }
 
-const authentificationService = new AuthentificationService(insertUser, retrieveUserByNom);
+const authentificationService = new AuthentificationService(insertUser, retrieveUserByNom, realBcrypt);
 
 export default authentificationService;

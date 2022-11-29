@@ -3,6 +3,7 @@ import { AuthentificationService } from 'Authentification/authentificationServic
 import { BadRequest, Endpoint, Ok } from 'global/api';
 import { validate } from 'global/validations';
 import * as jwt from 'jsonwebtoken';
+import { fizzBuzz } from 'Authentification/fizzbuzz';
 
 const UserForm = z.object({
   nom: z.string(),
@@ -43,3 +44,15 @@ export const loginAPI = (authentificationService: AuthentificationService): Endp
         )
       )
   );
+
+export const fizzBuzzAPI: Endpoint = (req) => {
+  let s = '';
+
+  for(let i = 0 ; i < 100 ; i++) {
+    s += fizzBuzz(i);
+  }
+
+  console.log(s);
+
+  return Promise.resolve(Ok());
+};

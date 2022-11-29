@@ -18,11 +18,11 @@ const upload = multer({
 const platsRoutes = (app: Express) => {
   app.get('/plat/:id', useEndpoint(getPlatByIdAPI(platsService)));
 
-  app.post('/plat', useEndpoint(secure(addPlatAPI(platsService))));
+  app.post('/plat', useEndpoint(addPlatAPI(platsService)));
 
-  app.put('/plat/:id', useEndpoint(secure(updatePlatAPI(platsService))));
+  app.put('/plat/:id', useEndpoint(updatePlatAPI(platsService)));
 
-  app.delete('/plat/:id', useEndpoint(secure(deletePlatAPI(platsService))));
+  app.delete('/plat/:id', useEndpoint(deletePlatAPI(platsService)));
 };
 
 export default platsRoutes;

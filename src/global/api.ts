@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { UserInfo } from 'Authentification/models';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { Jwt, JwtPayload, Secret, VerifyOptions } from 'jsonwebtoken';
+import { fakeJwt, JwtProxy } from 'global/jwt';
 
 interface ResultBody {
   success: boolean,
@@ -62,7 +65,7 @@ export const NotFound = (message?: string): Result => ({
 });
 
 
-export type Endpoint = (req: Request, userInfo?: UserInfo) => Promise<Result>;
+export type Endpoint = (req: Request | FakeRequest, userInfo?: UserInfo) => Promise<Result>;
 
 export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response) => {
   endpoint(req)
@@ -89,7 +92,9 @@ export const useEndpoint = (endpoint: Endpoint) => (req: Request, res: Response)
     });
 };
 
-export const secure = (endpoint: Endpoint): Endpoint => (req: Request): Promise<Result> => {
+export type Secure = (req: Request | FakeRequest) => (ifSecure: (user: UserInfo) => Promise<Result>) => Promise<Result>;
+
+export const secure = (jwt: JwtProxy): Secure => (req: Request | FakeRequest) => (ifSecure: (user: UserInfo) => Promise<Result>): Promise<Result> => {
   const token = req.header('X-Auth-Token');
 
   if (!token)
@@ -98,8 +103,32 @@ export const secure = (endpoint: Endpoint): Endpoint => (req: Request): Promise<
   try {
     const data = jwt.verify(token, process.env['JWT_SECRET'] || 'secret');
 
-    return endpoint(req, data as UserInfo);
+    return ifSecure(data as UserInfo);
   } catch (e: any) {
     return Promise.resolve(Unauthorized());
   }
 };
+
+export const fakeSecure: Secure = secure(fakeJwt);
+
+export type FakeRequestData = { [key: string]: any };
+
+export class FakeRequest {
+  params: ParamsDictionary;
+  body: FakeRequestData;
+  private headers: FakeRequestData;
+
+  constructor(params: ParamsDictionary = {}, body: FakeRequestData = {}, headers: FakeRequestData = {}) {
+    this.params = params;
+    this.body = body;
+    this.headers = headers;
+  }
+
+  header = (key: string) => this.headers[key];
+
+  withParams = (params: ParamsDictionary) => new FakeRequest(params, this.body, this.headers);
+
+  withBody = (body: FakeRequestData) => new FakeRequest(this.params, body, this.headers);
+
+  withHeaders = (headers: FakeRequestData) => new FakeRequest(this.params, this.body, headers);
+}
