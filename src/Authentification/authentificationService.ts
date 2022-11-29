@@ -1,7 +1,6 @@
 import insertUser, { InsertUser } from 'Authentification/daos/insertUser';
 import retrieveUserByNom, { RetrieveUserByNom } from 'Authentification/daos/retrieveUserByNom';
 import { User, UserInfo } from 'Authentification/models';
-import { Exception } from 'global/api';
 import * as bcrypt from 'bcrypt';
 import { Either, Left, Maybe, None, Right, Some } from 'monet';
 
@@ -46,6 +45,7 @@ export class AuthentificationService {
           )
       )
     )
+}
 
 const authentificationService = new AuthentificationService(insertUser, retrieveUserByNom);
 
