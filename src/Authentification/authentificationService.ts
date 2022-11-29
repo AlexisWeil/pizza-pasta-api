@@ -2,6 +2,7 @@ import insertUser, { InsertUser } from 'Authentification/daos/insertUser';
 import retrieveUserByNom, { RetrieveUserByNom } from 'Authentification/daos/retrieveUserByNom';
 import { User, UserInfo } from 'Authentification/models';
 import * as bcrypt from 'bcrypt';
+import { Exception } from 'global/api';
 import { Either, Left, Maybe, None, Right, Some } from 'monet';
 
 export class AuthentificationService {
@@ -31,7 +32,7 @@ export class AuthentificationService {
       );
 
 
-  verificationConnexion = (nom: string, motDePasse: string): Promise<Maybe<UserInfo>> =>
+  verificationConnexion = (nom: string, motDePasse: string): Promise<Either<Exception, UserInfo>> =>
     this.retrieveUserByNom(nom)
     .then((user) => 
       user.cata(
