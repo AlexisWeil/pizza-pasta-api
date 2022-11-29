@@ -1,4 +1,6 @@
 import k, { Knex } from 'knex';
+import { Left } from 'monet';
+import { Exception } from 'global/api';
 
 const initialisationKnex = () => {
   const knex = k({
@@ -13,5 +15,7 @@ const initialisationKnex = () => {
 };
 
 const knex = initialisationKnex();
+
+export const handleSQLException = <T>(key: string) => (e: any) => Left<Exception, T>(Exception(key, e.message));
 
 export default knex;

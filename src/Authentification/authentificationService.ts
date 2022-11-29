@@ -3,6 +3,7 @@ import retrieveUserByNom, { RetrieveUserByNom } from 'Authentification/daos/retr
 import { User, UserInfo } from 'Authentification/models';
 import { Exception } from 'global/api';
 import * as bcrypt from 'bcrypt';
+import { Either, Left, Right } from 'monet';
 
 export class AuthentificationService {
   private readonly insertUser: InsertUser;
@@ -31,26 +32,31 @@ export class AuthentificationService {
       );
 
 
-  verificationConnexion = (nom: string, motDePasse: string): Promise<UserInfo> =>
+  verificationConnexion = (nom: string, motDePasse: string): Promise<Either<Exception, UserInfo>> =>
     this.retrieveUserByNom(nom)
-      .then((user) => {
-        if (!user)
-          throw Exception('username', 'Utilisateur inconnu');
-
-        return bcrypt.compare(motDePasse, user.motDePasse)
-          .then((mdpValid) => {
-            if (mdpValid)
-              return ({
-                id: user.id,
-                nom: user.nom,
-                role: user.role,
-                serveurId: user.serveurId,
-                tablesIds: user.tablesIds
-              });
-            else
-              throw Exception('motDePasse', 'Mot de passe incorrect');
-          });
-      });
+      .then((eUser) =>
+        eUser.cata(
+          (e) => Promise.resolve(Left(e)),
+          (mUser) =>
+            mUser.cata(
+              () => Promise.resolve(Left(Exception('username', 'Utilisateur inconnu'))),
+              (user) =>
+                bcrypt.compare(motDePasse, user.motDePasse)
+                  .then((mdpValid) => {
+                    if (mdpValid)
+                      return Right<Exception, UserInfo>({
+                        id: user.id,
+                        nom: user.nom,
+                        role: user.role,
+                        serveurId: user.serveurId,
+                        tablesIds: user.tablesIds
+                      });
+                    else
+                      return Left(Exception('motDePasse', 'Mot de passe incorrect'));
+                  })
+            )
+        )
+      );
 }
 
 const authentificationService = new AuthentificationService(insertUser, retrieveUserByNom);

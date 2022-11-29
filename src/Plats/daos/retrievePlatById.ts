@@ -1,7 +1,9 @@
 import { Plat } from 'Plats/models';
-import knex from 'global/knex';
+import knex, { handleSQLException } from 'global/knex';
+import { Exception } from 'global/api';
+import { Either, Maybe, Right } from 'monet';
 
-export type RetrievePlatById = (id: number) => Promise<Plat | undefined>;
+export type RetrievePlatById = (id: number) => Promise<Either<Exception, Maybe<Plat>>>;
 
 const retrievePlatById: RetrievePlatById = (id: number) =>
   knex.select(
@@ -12,6 +14,8 @@ const retrievePlatById: RetrievePlatById = (id: number) =>
     knex.ref('ingredients')
   ).from<Plat>('plats')
     .where({ 'id': id })
-    .first();
+    .first()
+    .then((row) => Right<Exception, Maybe<Plat>>(Maybe.fromNull(row)))
+    .catch(handleSQLException('plat-retrieve'));
 
 export default retrievePlatById;

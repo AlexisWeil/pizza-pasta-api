@@ -12,10 +12,15 @@ export const getPlatByIdAPI = (platsService: PlatsService): Endpoint => (req: Re
     return Promise.resolve(BadRequest([Exception('id', 'ID is not a number')]));
 
   return platsService.getPlatById(id)
-    .then((plat: Plat | undefined) =>
-      plat ?
-        Ok(plat) :
-        NotFound('Plat inconnu')
+    .then((ePlat) =>
+      ePlat.cata(
+        (e) => BadRequest([e]),
+        (mPlat) =>
+          mPlat.cata(
+            () => NotFound('Plat inconnu'),
+            Ok
+          )
+      )
     );
 };
 

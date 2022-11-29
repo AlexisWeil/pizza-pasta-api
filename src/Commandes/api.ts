@@ -14,7 +14,12 @@ type CommandeForm = z.infer<typeof CommandeForm>;
 export const addCommandeAPI = (commandesService: CommandesService): Endpoint => (req) =>
   validate(CommandeForm)(req.body)((commande) =>
     commandesService.createCommande(commande)
-      .then(Ok)
+      .then((eCommande) =>
+        eCommande.cata(
+          BadRequest,
+          Ok
+        )
+      )
   );
 
 export const getCommandeByIdAPI = (commandesService: CommandesService): Endpoint => (req) => {
